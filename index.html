@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizly — Шығармашылық пен білім платформасы</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: #f6f3e9; color: #1a1e24; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        .serif-heading { font-family: 'Lora', serif; }
+        header { background: rgba(246, 243, 233, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+        .brand-logo { font-size: 26px; font-weight: 800; color: #1a1e24; letter-spacing: -0.5px; }
+        .brand-icon { background: #2a3fd8; color: white; width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(42, 63, 216, 0.25); }
+        .lang-switch { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(0, 0, 0, 0.08); padding: 3px; border-radius: 9999px; }
+        .lang-btn { color: #555e6d; border-radius: 9999px; padding: 5px 12px; font-size: 13px; font-weight: 600; transition: all 0.2s ease; }
+        .lang-btn.active { background: #2a3fd8; color: #ffffff; box-shadow: 0 2px 8px rgba(42, 63, 216, 0.3); }
+        .btn-header-lime { background: #c8dc32; color: #1a1e24; font-weight: 700; font-size: 13px; border-radius: 9999px; padding: 7px 18px; transition: all 0.2s ease; }
+        .btn-header-lime:hover { background: #b6ca25; transform: translateY(-1px); }
+        .btn-header-pill { background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.1); color: #2c333e; font-weight: 700; font-size: 13px; border-radius: 9999px; padding: 7px 16px; transition: all 0.2s ease; }
+        .btn-header-pill:hover { background: #ffffff; border-color: #2a3fd8; color: #2a3fd8; }
+        .btn-terracotta { background: #cf5a42; color: #ffffff; font-weight: 700; border-radius: 9999px; padding: 10px 24px; box-shadow: 0 4px 14px rgba(207, 90, 66, 0.25); transition: all 0.2s ease; }
+        .btn-terracotta:hover { background: #b84c36; transform: translateY(-1px); }
+        .btn-indigo { background: #2a3fd8; color: #ffffff; font-weight: 700; border-radius: 9999px; padding: 10px 24px; box-shadow: 0 4px 14px rgba(42, 63, 216, 0.25); transition: all 0.2s ease; }
+        .btn-indigo:hover { background: #1f31b6; transform: translateY(-1px); }
+        .hero-pill { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(0, 0, 0, 0.08); color: #2a3fd8; font-weight: 700; font-size: 13px; border-radius: 9999px; padding: 6px 16px; display: inline-flex; align-items: center; gap: 6px; }
+        .text-terracotta { color: #cf5a42; }
+        .cards-container { position: relative; width: 340px; height: 380px; }
+        .hero-card-blue { background: #283cd8; color: white; border-radius: 28px; width: 230px; height: 310px; padding: 24px; position: absolute; left: 20px; top: 20px; transform: rotate(-7deg); box-shadow: 0 20px 45px rgba(40, 60, 216, 0.28); z-index: 10; display: flex; flex-direction: column; justify-content: space-between; }
+        .hero-card-lime { background: #c8dc32; color: #1a1e24; border-radius: 28px; width: 230px; height: 310px; padding: 24px; position: absolute; right: 15px; top: 10px; transform: rotate(8deg); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.07); z-index: 5; display: flex; flex-direction: column; justify-content: space-between; }
+        .hero-card-accent { background: #cf5a42; color: white; border-radius: 18px; width: 52px; height: 52px; position: absolute; bottom: 30px; right: 35px; z-index: 20; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .filter-pill { background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.08); color: #4a5568; font-size: 13.5px; font-weight: 600; padding: 8px 18px; border-radius: 9999px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
+        .filter-pill.active { background: #2a3fd8; color: #ffffff; border-color: #2a3fd8; box-shadow: 0 4px 12px rgba(42, 63, 216, 0.25); }
+        .topic-card { background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 24px; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+        .topic-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(42, 63, 216, 0.08); }
+        .quiz-card-box { background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 28px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04); }
+        .option-item { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 16px; transition: all 0.2s ease; }
+        .option-item:hover { border-color: #2a3fd8; background: rgba(42, 63, 216, 0.03); }
+        .option-item.selected { border-color: #2a3fd8; background: rgba(42, 63, 216, 0.08); color: #1e293b; font-weight: 600; }
+        .ai-chat-window { background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.1); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15); border-radius: 24px; }
+        .spinner { border: 3px solid rgba(0,0,0,0.1); border-left-color: #2a3fd8; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <header class="sticky top-0 z-50 px-4 md:px-8 py-3.5 flex justify-between items-center">
+        <div class="brand-logo flex items-center gap-2.5 cursor-pointer" onclick="switchView('topics')">
+            <div class="brand-icon"><i class="fa-solid fa-sparkles text-lg"></i></div>
+            <span class="font-bold text-2xl tracking-tight">quizly</span>
+        </div>
+
+        <div class="flex items-center gap-2.5 md:gap-3 flex-wrap">
+            <div class="lang-switch flex items-center mr-1">
+                <button class="lang-btn" id="btn-ru" onclick="changeLanguage('ru')">Русский</button>
+                <button class="lang-btn" id="btn-en" onclick="changeLanguage('en')">English</button>
+                <button class="lang-btn active" id="btn-kk" onclick="changeLanguage('kk')">Қазақша</button>
+            </div>
+            <button class="btn-header-lime cursor-pointer flex items-center gap-1.5 shadow-sm" onclick="openAuthModal()">
+                <i class="fa-solid fa-user text-xs"></i> <span id="ui-login-btn">Тіркелу</span>
+            </button>
+            <button class="btn-header-pill cursor-pointer flex items-center gap-1.5" onclick="promptTeacherAccess()">
+                <i class="fa-solid fa-shield-halved text-indigo-600"></i> <span id="ui-teacher-panel-btn">Оқытушы (PIN)</span>
+            </button>
+            <button class="text-xs font-bold text-slate-500 hover:text-slate-800 px-2 py-1 transition" onclick="logoutUser()">Шығу</button>
+            <div class="hidden bg-white border border-indigo-200 px-4 py-1.5 rounded-full text-xs font-bold text-indigo-600 shadow-sm flex items-center gap-2 ml-2" id="timer-display">
+                <i class="fa-regular fa-clock"></i> <span id="timer-text">10:00</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-10 w-full flex-1">
+
+        <!-- 1. TOPICS & STUDENT HERO VIEW -->
+        <div id="view-topics">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-14">
+                <div class="lg:col-span-7">
+                    <div class="mb-5"><span class="hero-pill"><i class="fa-solid fa-paperclip text-indigo-500"></i> <span id="ui-hero-tag">Жанға арналған азық</span></span></div>
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 leading-[1.12]">
+                        <span class="serif-heading block text-slate-900" id="ui-title-line1">Қызық болыңыз.</span>
+                        <span class="serif-heading block text-terracotta" id="ui-title-line2">Біраз ойнап көріңіз.</span>
+                    </h1>
+                    <p class="text-slate-600 text-base md:text-lg leading-relaxed mb-8 max-w-xl" id="ui-subtitle">30 түрлі санаттағы мықты тесттер жиынтығы. Карточканы таңдап, біліміңізді сынап көріңіз.</p>
+                    <div class="flex flex-wrap items-center gap-4">
+                        <button class="btn-indigo flex items-center gap-2 text-sm shadow-lg shadow-indigo-600/20" onclick="scrollToTopics()"><i class="fa-solid fa-play text-xs"></i> <span id="ui-btn-start">Бастау</span></button>
+                        <button class="bg-white border border-slate-200 text-slate-700 font-bold px-6 py-3 rounded-full text-sm hover:bg-slate-50 transition shadow-sm" onclick="openAuthModal()"><span id="ui-btn-signin">Тіркеліп кіру</span></button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 flex items-center justify-center py-6">
+                    <div class="cards-container">
+                        <div class="hero-card-blue">
+                            <div class="flex justify-between items-center"><span class="text-[11px] font-bold uppercase tracking-wider opacity-80">QUIZLY</span><i class="fa-solid fa-sparkles text-xs"></i></div>
+                            <div class="serif-heading text-2xl font-bold leading-snug">30+ Тест. Үлкен ұшқын.</div>
+                            <div class="text-xs font-bold flex items-center gap-1 opacity-90">Тексеру <i class="fa-solid fa-arrow-right text-[10px] ml-1"></i></div>
+                        </div>
+                        <div class="hero-card-lime">
+                            <div class="flex justify-between items-center">
+                                <div class="bg-white/80 border border-black/5 px-2.5 py-0.5 rounded-full text-[11px] font-bold text-slate-800 flex items-center gap-1"><i class="fa-solid fa-trophy text-amber-500 text-[10px]"></i> 30 Тест</div>
+                                <i class="fa-solid fa-lightbulb text-xs opacity-70"></i>
+                            </div>
+                            <div class="serif-heading text-3xl font-bold text-slate-900 leading-tight">Дайынсың ба?</div>
+                            <div class="flex justify-end"><div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-sm">+</div></div>
+                        </div>
+                        <div class="hero-card-accent"><i class="fa-solid fa-plus"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-indigo-100 rounded-3xl p-6 mb-12 shadow-sm flex flex-wrap items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-bold">✨</div>
+                <div class="flex-1 min-w-[200px]">
+                    <div class="font-bold text-base text-slate-900" id="ui-ai-gen-title">AI Тақырып Генераторы</div>
+                    <div class="text-xs text-slate-500" id="ui-ai-gen-desc">Кез келген тақырыпты енгізіңіз, AI сұрақтар құрастырады</div>
+                </div>
+                <input type="text" id="custom-topic-input" class="flex-1 min-w-[240px] bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-indigo-600" placeholder="Мысалы: Кванттық физика, Космос...">
+                <button class="btn-indigo text-sm flex items-center gap-2 shadow-md cursor-pointer" onclick="generateAITopic()" id="btn-generate-ai">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> <span id="ui-btn-gen">Генерациялау</span>
+                </button>
+            </div>
+
+            <div id="topics-section" class="mb-6">
+                <div class="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-1" id="ui-mood-lbl">КӨҢІЛ-КҮЙДІ ТАҢДАҢЫЗ</div>
+                <h2 class="serif-heading text-3xl font-bold text-slate-900 mb-6" id="ui-section-topics">30 тамаша викторина</h2>
+                <div class="flex items-center gap-2.5 overflow-x-auto pb-4 no-scrollbar">
+                    <button class="filter-pill active" onclick="filterTopics('all', event)" id="f-all">Барлық 30 тест</button>
+                    <button class="filter-pill" onclick="filterTopics('science', event)" id="f-science">Ғылым & Технология</button>
+                    <button class="filter-pill" onclick="filterTopics('culture', event)" id="f-culture">Мәдениет & Өнер</button>
+                    <button class="filter-pill" onclick="filterTopics('geo', event)" id="f-geo">География</button>
+                    <button class="filter-pill" onclick="filterTopics('history', event)" id="f-history">Тарих</button>
+                    <button class="filter-pill" onclick="filterTopics('programming', event)" id="f-prog">Бағдарламалау</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="topics-grid"></div>
+
+            <div class="mt-8 bg-white/70 border border-slate-200/80 rounded-3xl p-6">
+                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2" id="ui-history-title">
+                    <i class="fa-solid fa-clock-rotate-left text-indigo-600"></i> Өткен тесттер тарихы
+                </h3>
+                <div id="history-list" class="flex flex-col gap-3"></div>
+            </div>
+        </div>
+
+        <!-- 2. ACTIVE QUIZ VIEW -->
+        <div id="view-quiz" class="hidden grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div class="lg:col-span-3 quiz-card-box p-6 md:p-8 relative">
+                <div class="w-full bg-slate-100 h-2.5 rounded-full mb-6 overflow-hidden">
+                    <div class="bg-indigo-600 h-full transition-all duration-300" id="progress-bar" style="width: 0%;"></div>
+                </div>
+
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider" id="question-index-text">Сұрақ 1 / 5</span>
+                    <button class="bg-amber-500/10 border border-amber-500/30 text-amber-700 px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 hover:bg-amber-500/20 transition cursor-pointer" onclick="getAIHint()">
+                        <i class="fa-regular fa-lightbulb"></i> <span id="ui-hint-btn">AI Көмек</span>
+                    </button>
+                </div>
+
+                <h2 class="text-xl md:text-2xl font-bold text-slate-900 mb-6 leading-relaxed" id="question-text">...</h2>
+                <div id="hint-container" class="hidden bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl mb-6 text-amber-900 text-sm"></div>
+                <div class="flex flex-col gap-3 mb-8" id="options-container"></div>
+
+                <div class="flex justify-between gap-3">
+                    <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-6 py-3 rounded-2xl transition flex items-center gap-2 disabled:opacity-40" id="btn-prev" onclick="prevQuestion()">
+                        <i class="fa-solid fa-arrow-left"></i> <span id="ui-btn-prev">Артқа</span>
+                    </button>
+                    <button class="btn-indigo flex items-center gap-2 text-sm shadow-md cursor-pointer" id="btn-next" onclick="nextQuestion()">
+                        <span id="ui-btn-next">Келесі</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="quiz-card-box p-6 h-fit">
+                <div class="font-bold text-base text-slate-900 mb-4" id="ui-questions-list">Сұрақтар тізімі</div>
+                <div class="grid grid-cols-4 gap-2 mb-6" id="nav-grid"></div>
+                <button class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-2xl transition flex items-center justify-center gap-2 shadow-lg cursor-pointer" onclick="finishQuiz()">
+                    <i class="fa-solid fa-check-double"></i> <span id="ui-finish-btn">Тестті аяқтау</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. TEACHER DASHBOARD VIEW -->
+        <div id="view-teacher" class="hidden space-y-8">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
+                <div>
+                    <span class="text-xs font-extrabold text-indigo-600 uppercase tracking-widest">ОҚЫТУШЫ ПАНЕЛІ (Админ)</span>
+                    <h2 class="serif-heading text-3xl font-bold text-slate-900">Тесттер мен оқушылар нәтижесі</h2>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button class="bg-indigo-600 text-white px-5 py-2.5 rounded-full text-xs font-bold shadow-md hover:bg-indigo-700 transition cursor-pointer" onclick="switchTeacherTab('create')"><i class="fa-solid fa-plus mr-1"></i> Тест жасау</button>
+                    <button class="bg-white border border-slate-200 text-slate-700 px-5 py-2.5 rounded-full text-xs font-bold hover:bg-slate-50 transition cursor-pointer" onclick="switchTeacherTab('results')"><i class="fa-solid fa-chart-user mr-1"></i> Оқушы нәтижелері</button>
+                    <button class="bg-amber-500 text-white px-5 py-2.5 rounded-full text-xs font-bold shadow-md hover:bg-amber-600 transition cursor-pointer" onclick="openQrModal()"><i class="fa-solid fa-qrcode mr-1"></i> QR Кодты Көрсету</button>
+                    <button class="text-xs font-bold text-slate-500 hover:text-slate-800 underline ml-2 cursor-pointer" onclick="switchRole('student')">Оқушы режиміне қайту</button>
+                </div>
+            </div>
+
+            <div id="teacher-tab-create" class="max-w-3xl mx-auto quiz-card-box p-8">
+                <h3 class="serif-heading text-2xl font-bold text-slate-900 mb-1">Өз тестіңізді жасаңыз</h3>
+                <p class="text-slate-500 text-sm mb-6">Сұрақтар мен дұрыс жауаптарды қосыңыз — бұл тест оқушылардың барлығына бірден көрінеді.</p>
+                <div class="space-y-4 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Тест атауы</label>
+                            <input type="text" id="teacher-quiz-title" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-900 focus:outline-none focus:border-indigo-600" placeholder="Мысалы: Физика 9-сынып">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Санат</label>
+                            <select id="teacher-quiz-cat" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-900 focus:outline-none focus:border-indigo-600">
+                                <option value="science">Ғылым & Технология</option>
+                                <option value="culture">Мәдениет & Өнер</option>
+                                <option value="geo">География</option>
+                                <option value="history">Тарих</option>
+                                <option value="programming">Бағдарламалау</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Сипаттама</label>
+                        <textarea id="teacher-quiz-desc" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-900 focus:outline-none focus:border-indigo-600" placeholder="Қысқаша түсініктеме..."></textarea>
+                    </div>
+                </div>
+                <div id="teacher-questions-list" class="space-y-6 mb-6"></div>
+                <div class="flex gap-4">
+                    <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 py-3 rounded-xl text-sm transition cursor-pointer" onclick="addTeacherQuestion()"><i class="fa-solid fa-plus text-indigo-600 mr-1"></i> Сұрақ қосу</button>
+                    <button class="flex-1 btn-terracotta text-center font-bold py-3 text-sm shadow-md cursor-pointer" onclick="saveTeacherQuiz()">Тестті сақтау & Жариялау</button>
+                </div>
+            </div>
+
+            <div id="teacher-tab-results" class="hidden max-w-4xl mx-auto quiz-card-box p-8">
+                <h3 class="serif-heading text-2xl font-bold text-slate-900 mb-1">Оқушы нәтижелері</h3>
+                <p class="text-slate-500 text-sm mb-6">Барлық оқушылардың орындаған тесттерінің онлайн тізімі.</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-700">
+                        <thead class="bg-slate-100 text-xs text-slate-600 uppercase font-bold rounded-xl">
+                            <tr>
+                                <th class="p-3.5 rounded-l-xl">Оқушы Аты / Поштасы</th>
+                                <th class="p-3.5">Тест Тақырыбы</th>
+                                <th class="p-3.5">Күні</th>
+                                <th class="p-3.5">Нәтиже</th>
+                                <th class="p-3.5 rounded-r-xl">Мәртебесі</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-results-tbody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. RESULT VIEW -->
+        <div id="view-results" class="hidden max-w-3xl mx-auto quiz-card-box p-8 text-center">
+            <h1 class="serif-heading text-3xl font-extrabold text-slate-900 mb-2" id="ui-result-title">Тест Нәтижесі</h1>
+            <p class="text-slate-500 text-sm mb-8" id="result-topic-title">Тақырып</p>
+            <div class="w-40 h-40 rounded-full bg-indigo-50 border-4 border-indigo-600 flex flex-col justify-center items-center mx-auto mb-8 shadow-xl shadow-indigo-600/10">
+                <div class="text-4xl font-extrabold text-indigo-600" id="score-percent">0%</div>
+                <div class="text-xs text-slate-500 mt-1" id="score-text">0 / 0</div>
+            </div>
+            <div class="flex flex-wrap gap-4 justify-center mb-8">
+                <button class="btn-indigo text-sm flex items-center gap-2 cursor-pointer" onclick="switchView('topics')"><i class="fa-solid fa-house"></i> <span id="ui-back-btn">Басқа тақырып</span></button>
+                <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-6 py-3 rounded-full text-sm transition flex items-center gap-2 cursor-pointer" onclick="restartQuiz()"><i class="fa-solid fa-rotate-right"></i> Қайта тапсыру</button>
+            </div>
+            <div class="text-left" id="review-list"></div>
+        </div>
+    </main>
+
+    <!-- MODALS & WIDGETS -->
+    <div id="ai-loading-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-md z-50 hidden flex-col items-center justify-center p-4 text-white">
+        <div class="w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center text-2xl shadow-2xl animate-bounce mb-4">✨</div>
+        <h3 class="serif-heading text-2xl font-bold mb-2">AI тақырыпты талдап жатыр...</h3>
+        <p class="text-sm text-slate-200">Сізге арнайы қызықты сұрақтар құрастырылуда. Сәл күте тұрыңыз!</p>
+    </div>
+
+    <div id="auth-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl relative">
+            <button class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg cursor-pointer" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="serif-heading text-2xl font-bold text-slate-900 mb-2">Quizly-ге тіркеліңіз</h3>
+            <p class="text-xs text-slate-500 mb-6">Тест бастамас бұрын атыңыз бен поштаңызды енгізіңіз</p>
+            <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Аты-жөніңіз</label>
+                    <input type="text" id="auth-name-input" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-600" placeholder="Мысалы: Айдын Оразбаев">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Электрондық пошта</label>
+                    <input type="email" id="auth-email-input" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-600" placeholder="student@gmail.com">
+                </div>
+                <button type="submit" class="w-full btn-terracotta text-center font-bold py-3 mt-2 shadow-md cursor-pointer">Тіркелу & Бастау &rarr;</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="teacher-pin-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl relative text-center">
+            <button class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg cursor-pointer" onclick="closeTeacherPinModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-bold mx-auto mb-3"><i class="fa-solid fa-shield-halved"></i></div>
+            <h3 class="serif-heading text-xl font-bold text-slate-900 mb-1">Оқытушы PIN коды</h3>
+            <p class="text-xs text-slate-500 mb-4">Панельге кіру үшін өз құпия PIN кодыңызды енгізіңіз</p>
+            <input type="password" id="teacher-pin-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-center font-bold tracking-widest mb-4 focus:outline-none focus:border-indigo-600" placeholder="••••••••">
+            <button type="button" onclick="verifyTeacherPin()" class="w-full btn-indigo py-3 text-sm shadow-md cursor-pointer">Растау & Кіру</button>
+        </div>
+    </div>
+
+    <div id="qr-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl relative text-center">
+            <button class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg cursor-pointer" onclick="closeQrModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-bold mx-auto mb-3"><i class="fa-solid fa-qrcode"></i></div>
+            <h3 class="serif-heading text-xl font-bold text-slate-900 mb-1">Оқушыларға арналған QR Код</h3>
+            <p class="text-xs text-slate-500 mb-4">Оқушылар сканерлегенде бірден оқушы панеліне (басты бетке) кіреді:</p>
+            <div class="bg-slate-100 p-4 rounded-2xl mb-4 flex justify-center">
+                <img id="qr-code-img" src="" alt="QR Code" class="w-48 h-48 rounded-xl object-contain bg-white p-2">
+            </div>
+            <p class="text-xs text-indigo-600 font-bold break-all" id="current-url-text">https://quizly.app</p>
+        </div>
+    </div>
+
+    <button class="fixed bottom-6 right-6 bg-indigo-600 text-white font-bold px-5 py-3.5 rounded-full shadow-2xl shadow-indigo-600/40 flex items-center gap-3 z-50 hover:scale-105 transition cursor-pointer" onclick="toggleAIChat()">
+        <i class="fa-solid fa-robot text-lg"></i> <span>AI Көмекші</span>
+    </button>
+
+    <div class="ai-chat-window fixed bottom-24 right-6 w-80 md:w-96 h-[460px] rounded-3xl flex flex-col z-50 hidden overflow-hidden" id="ai-chat-window">
+        <div class="bg-slate-50 px-5 py-4 border-b border-slate-100 flex justify-between items-center font-bold text-slate-800">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-sparkles text-indigo-600"></i> quizly AI Tutor</span>
+            <span class="cursor-pointer text-slate-400 hover:text-slate-600" onclick="toggleAIChat()"><i class="fa-solid fa-xmark"></i></span>
+        </div>
+        <div class="flex-1 p-4 overflow-y-auto flex flex-col gap-3 text-sm bg-slate-50/50" id="chat-body">
+            <div class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm self-start text-slate-700 max-w-[85%]" id="ui-bot-welcome">
+                Сәлем! Мен сіздің AI репетиторыңызбын. Кез келген сұрағыңызды қойыңыз!
+            </div>
+        </div>
+        <div class="p-3 bg-white border-t border-slate-100 flex gap-2">
+            <input type="text" id="chat-input" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none" placeholder="Сұрағыңызды жазыңыз..." onkeypress="if(event.key==='Enter') sendAIMessage()">
+            <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 rounded-xl transition cursor-pointer" onclick="sendAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed top-5 right-5 z-50 transform -translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-emerald-400" id="toast-icon"></i>
+        <span id="toast-message">Хабарлама</span>
+    </div>
+
+    <!-- МІНДЕТТІ ТҮРДЕ: ЖҮЙЕЛІК СКРИПТТЕРДІҢ БЛОГЫ (БАРЛЫҚ ҚАТЕЛЕР ТҮЗЕТІЛДІ) -->
+    <script type="module">
+        // 1. БАЗАЛЫҚ АЙНЫМАЛЫЛАР
+        window.currentLang = 'kk';
+        window.currentRole = 'student';
+        window.currentUserName = '';
+        window.currentUserEmail = '';
+        window.isLoggedIn = false;
+        window.pendingQuizToStart = null;
+        window.currentQuiz = null;
+        window.currentQuestionIdx = 0;
+        window.userAnswers = [];
+        window.timerInterval = null;
+        window.timerSeconds = 600;
+
+        let db = null;
+        const appId = 'quizly-app-id';
+
+        // Local Storage-тен алдыңғы мәліметтерді оқу (Дерекқор істемеген жағдайдағы сақтық көшірме)
+        let firebaseTeacherQuizzes = [];
+        let firebaseStudentResults = [];
+        try {
+            firebaseTeacherQuizzes = JSON.parse(localStorage.getItem('local_quizzes') || '[]');
+            firebaseStudentResults = JSON.parse(localStorage.getItem('local_results') || '[]');
+            window.currentUserName = localStorage.getItem('quizly_user_name') || '';
+            window.currentUserEmail = localStorage.getItem('quizly_user_email') || '';
+            window.isLoggedIn = !!window.currentUserName;
+        } catch(e) {}
+
+        const STATIC_TOPICS = Array.from({length: 30}, (_, i) => {
+            const categories = ['science', 'culture', 'geo', 'history', 'programming'];
+            const cat = categories[i % categories.length];
+            const badges = {science: 'Ғылым', culture: 'Мәдениет', geo: 'География', history: 'Тарих', programming: 'Бағдарламалау'};
+            return {
+                id: `q_${i+1}`, category: cat, badge: badges[cat],
+                title: { kk: `${badges[cat]} викторинасы №${i+1}`, ru: `${badges[cat]} квиз №${i+1}`, en: `${badges[cat]} Quiz #${i+1}` },
+                desc: { kk: `Бұл тест арқылы ${badges[cat].toLowerCase()} саласындағы біліміңізді тексеріңіз.`, ru: `Проверьте свои знания.`, en: `Test your knowledge.` },
+                questions: [
+                    { q: `${i+1}-ші тесттің 1-ші сұрағы: Негізгі ұғымды атаңыз?`, options: ["А нұсқасы", "Б нұсқасы", "В нұсқасы", "Дұрыс жауап"], answer: 3, hint: "Көмек: Төртінші нұсқа." },
+                    { q: `${i+1}-ші тесттің 2-ші сұрағы: Қай тұжырым дұрыс?`, options: ["Теория", "Практика", "Екеуі де дұрыс", "Ешқайсысы"], answer: 2, hint: "Кешенді көзқарас." },
+                    { q: `${i+1}-ші тесттің 3-ші сұрағы: Маңызды көрсеткіш?`, options: ["Дұрыс жауап", "Қате", "Орташа", "Тұрақты"], answer: 0, hint: "Бірінші нұсқа." }
+                ]
+            };
+        });
+
+        const TRANSLATIONS = {
+            kk: { login: "Тіркелу", teacherPanel: "Оқытушы (PIN)", heroTag: "Жанға арналған азық", title1: "Қызық болыңыз.", title2: "Біраз ойнап көріңіз.", subtitle: "30 түрлі санаттағы мықты тесттер жиынтығы. Карточканы таңдап, біліміңізді сынап көріңіз.", startBtn: "Бастау", signinBtn: "Тіркеліп кіру", aiTitle: "AI Тақырып Генераторы", aiDesc: "Кез келген тақырыпты енгізіңіз, AI сұрақтар құрастырады", genBtn: "Генерациялау", moodLbl: "КӨҢІЛ-КҮЙДІ ТАҢДАҢЫЗ", sectionTitle: "30 тамаша викторина", fAll: "Барлық 30 тест", fScience: "Ғылым & Технология", fCulture: "Мәдениет & Өнер", fGeo: "География", fHistory: "Тарих", fProg: "Бағдарламалау", historyTitle: "Өткен тесттер тарихы", hintBtn: "AI Көмек", backLbl: "Артқа", nextLbl: "Келесі", finishLbl: "Тестті аяқтау", qListTitle: "Сұрақтар тізімі", resTitle: "Тест Нәтижесі", resHome: "Басқа тақырып", resRestart: "Қайта тапсыру" },
+            ru: { login: "Регистрация", teacherPanel: "Учитель (PIN)", heroTag: "Пища для ума", title1: "Будьте любопытны.", title2: "Поиграйте с знаниями.", subtitle: "Коллекция из 30 крутых тестов разных категорий.", startBtn: "Начать", signinBtn: "Войти", aiTitle: "ИИ Генератор", aiDesc: "Введите тему, ИИ составит вопросы", genBtn: "Создать", moodLbl: "КАТЕГОРИИ", sectionTitle: "30 викторин", fAll: "Все 30", fScience: "Наука", fCulture: "Культура", fGeo: "География", fHistory: "История", fProg: "IT", historyTitle: "История тестов", hintBtn: "ИИ Подсказка", backLbl: "Назад", nextLbl: "Далее", finishLbl: "Завершить", qListTitle: "Вопросы", resTitle: "Результат", resHome: "Домой", resRestart: "Заново" },
+            en: { login: "Register", teacherPanel: "Teacher (PIN)", heroTag: "Food for thought", title1: "Stay curious.", title2: "Play with knowledge.", subtitle: "A collection of 30 great quizzes.", startBtn: "Start", signinBtn: "Sign In", aiTitle: "AI Generator", aiDesc: "Enter topic, AI will create questions", genBtn: "Generate", moodLbl: "CATEGORIES", sectionTitle: "30 Quizzes", fAll: "All 30", fScience: "Science", fCulture: "Culture", fGeo: "Geography", fHistory: "History", fProg: "IT", historyTitle: "Quiz History", hintBtn: "AI Hint", backLbl: "Back", nextLbl: "Next", finishLbl: "Finish", qListTitle: "Questions", resTitle: "Result", resHome: "Home", resRestart: "Retry" }
+        };
+
+        // 2. БАРЛЫҚ UI ФУНКЦИЯЛАР (Қате шықса да жұмыс істеуі үшін алдын-ала анықталған)
+        window.showToast = function(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            document.getElementById('toast-message').textContent = msg;
+            document.getElementById('toast-icon').className = isError ? "fa-solid fa-triangle-exclamation text-rose-400" : "fa-solid fa-circle-check text-emerald-400";
+            toast.classList.remove('-translate-y-20', 'opacity-0'); toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => { toast.classList.remove('translate-y-0', 'opacity-100'); toast.classList.add('-translate-y-20', 'opacity-0'); }, 3500);
+        };
+
+        window.changeLanguage = function(lang) {
+            window.currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            if (document.getElementById(`btn-${lang}`)) document.getElementById(`btn-${lang}`).classList.add('active');
+            
+            const t = TRANSLATIONS[lang] || TRANSLATIONS.kk;
+            const setTxt = (id, txt) => { if(document.getElementById(id)) document.getElementById(id).textContent = txt; };
+            
+            setTxt('ui-login-btn', window.isLoggedIn ? `👤 ${window.currentUserName}` : t.login);
+            setTxt('ui-teacher-panel-btn', t.teacherPanel); setTxt('ui-hero-tag', t.heroTag);
+            setTxt('ui-title-line1', t.title1); setTxt('ui-title-line2', t.title2);
+            setTxt('ui-subtitle', t.subtitle); setTxt('ui-btn-start', t.startBtn);
+            setTxt('ui-btn-signin', t.signinBtn); setTxt('ui-ai-gen-title', t.aiTitle);
+            setTxt('ui-ai-gen-desc', t.aiDesc); setTxt('ui-btn-gen', t.genBtn);
+            setTxt('ui-mood-lbl', t.moodLbl); setTxt('ui-section-topics', t.sectionTitle);
+            setTxt('f-all', t.fAll); setTxt('f-science', t.fScience); setTxt('f-culture', t.fCulture);
+            setTxt('f-geo', t.fGeo); setTxt('f-history', t.fHistory); setTxt('f-prog', t.fProg);
+            setTxt('ui-hint-btn', t.hintBtn); setTxt('ui-btn-prev', t.backLbl);
+            setTxt('ui-btn-next', t.nextLbl); setTxt('ui-finish-btn', t.finishLbl);
+            setTxt('ui-questions-list', t.qListTitle); setTxt('ui-result-title', t.resTitle);
+            setTxt('ui-back-btn', t.resHome);
+            if(document.getElementById('ui-history-title')) document.getElementById('ui-history-title').innerHTML = `<i class="fa-solid fa-clock-rotate-left text-indigo-600"></i> ${t.historyTitle}`;
+            renderTopics();
+        };
+
+        window.openAuthModal = function() {
+            if (window.isLoggedIn) { window.showToast(`Сіз ${window.currentUserName} болып кіргенсіз.`); return; }
+            document.getElementById('auth-modal').classList.remove('hidden');
+        };
+        window.closeAuthModal = function() { document.getElementById('auth-modal').classList.add('hidden'); };
+        
+        window.handleAuthSubmit = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('auth-name-input').value.trim();
+            const email = document.getElementById('auth-email-input').value.trim();
+            if (!name || !email) { window.showToast("Барлық өрісті толтырыңыз!", true); return; }
+
+            window.currentUserName = name; window.currentUserEmail = email;
+            window.isLoggedIn = true; window.currentRole = 'student';
+
+            try {
+                localStorage.setItem('quizly_user_name', name);
+                localStorage.setItem('quizly_user_email', email);
+            } catch(err) {}
+
+            document.getElementById('ui-login-btn').textContent = `👤 ${name}`;
+            window.closeAuthModal(); window.showToast(`Қош келдіңіз, ${name}!`);
+
+            if (window.pendingQuizToStart) {
+                const q = window.pendingQuizToStart;
+                window.pendingQuizToStart = null;
+                startQuiz(q);
+            }
+        };
+
+        window.logoutUser = function() {
+            window.currentUserName = ''; window.currentUserEmail = ''; window.isLoggedIn = false; window.currentRole = 'student';
+            try { localStorage.removeItem('quizly_user_name'); localStorage.removeItem('quizly_user_email'); } catch(e){}
+            document.getElementById('ui-login-btn').textContent = TRANSLATIONS[window.currentLang].login;
+            window.switchRole('student'); window.showToast('Шықтыңыз!');
+        };
+
+        window.promptTeacherAccess = function() { document.getElementById('teacher-pin-modal').classList.remove('hidden'); };
+        window.closeTeacherPinModal = function() { document.getElementById('teacher-pin-modal').classList.add('hidden'); };
+        window.verifyTeacherPin = function() {
+            const pin = document.getElementById('teacher-pin-input').value.trim();
+            if (pin.length >= 3) {
+                window.closeTeacherPinModal();
+                window.currentUserName = 'Оқытушы (Admin)'; window.currentUserEmail = 'teacher@quizly.edu';
+                window.isLoggedIn = true; window.currentRole = 'teacher';
+                document.getElementById('ui-login-btn').textContent = `👨‍🏫 Оқытушы`;
+                window.showToast("Оқытушы режимі қосылды!"); window.switchRole('teacher');
+                document.getElementById('teacher-pin-input').value = '';
+            } else { window.showToast("PIN кемінде 3 таңба!", true); }
+        };
+
+        window.openQrModal = function() {
+            const url = window.location.href.includes('http') ? window.location.href : "https://quizly.app";
+            document.getElementById('current-url-text').textContent = url;
+            document.getElementById('qr-code-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
+            document.getElementById('qr-modal').classList.remove('hidden');
+        };
+        window.closeQrModal = function() { document.getElementById('qr-modal').classList.add('hidden'); };
+
+        window.switchRole = function(role) {
+            window.currentRole = role;
+            if (role === 'teacher') {
+                if (!window.isLoggedIn || window.currentRole !== 'teacher') { window.promptTeacherAccess(); return; }
+                window.switchView('teacher'); window.switchTeacherTab('create');
+            } else { window.switchView('topics'); }
+        };
+
+        window.switchView = function(viewName) {
+            ['topics', 'quiz', 'teacher', 'results'].forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.add('hidden');
+            });
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            if (viewName !== 'quiz') clearInterval(window.timerInterval);
+        };
+
+        window.switchTeacherTab = function(tab) {
+            if (tab === 'create') {
+                document.getElementById('teacher-tab-create').classList.remove('hidden');
+                document.getElementById('teacher-tab-results').classList.add('hidden');
+                if (document.getElementById('teacher-questions-list').children.length === 0) window.addTeacherQuestion();
+            } else {
+                document.getElementById('teacher-tab-create').classList.add('hidden');
+                document.getElementById('teacher-tab-results').classList.remove('hidden');
+                renderStudentResults();
+            }
+        };
+
+        window.scrollToTopics = function() { document.getElementById('topics-section').scrollIntoView({ behavior: 'smooth' }); };
+        
+        let currentFilter = 'all';
+        window.filterTopics = function(cat, ev) {
+            currentFilter = cat;
+            document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
+            if (ev && ev.target) ev.target.classList.add('active');
+            renderTopics();
+        };
+
+        function renderTopics() {
+            const grid = document.getElementById('topics-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            
+            const renderCard = (obj, isTeacher) => {
+                if (currentFilter !== 'all' && obj.category !== currentFilter) return;
+                const card = document.createElement('div');
+                card.className = isTeacher 
+                    ? 'topic-card p-6 cursor-pointer flex flex-col justify-between border-indigo-200 min-h-[220px] bg-gradient-to-br from-indigo-50/40 to-white'
+                    : 'topic-card p-6 cursor-pointer flex flex-col justify-between relative min-h-[220px]';
+                card.onclick = () => startQuiz(isTeacher ? obj : { title: obj.title[window.currentLang] || obj.title['kk'], questions: obj.questions });
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="text-xs font-bold ${isTeacher ? 'text-indigo-600' : 'text-slate-400'} mb-2">
+                            ${isTeacher ? '<i class="fa-solid fa-cloud"></i> Жаңа Тест' : obj.badge} • ${obj.questions.length} сұрақ
+                        </div>
+                        <h3 class="serif-heading font-bold text-2xl text-slate-900 mb-2">${isTeacher ? obj.title : (obj.title[window.currentLang] || obj.title['kk'])}</h3>
+                        <p class="text-sm text-slate-500 mb-6">${isTeacher ? (obj.desc || 'Оқытушы жасаған арнайы тест.') : (obj.desc[window.currentLang] || obj.desc['kk'])}</p>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold ${isTeacher ? 'text-terracotta' : 'text-indigo-600'}">${isTeacher ? 'Өту' : 'Бастау'} &rarr;</span>
+                        <div class="w-9 h-9 rounded-full ${isTeacher ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-700'} flex items-center justify-center text-sm"><i class="fa-solid ${isTeacher ? 'fa-play' : 'fa-arrow-right'}"></i></div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            };
+
+            STATIC_TOPICS.forEach(t => renderCard(t, false));
+            firebaseTeacherQuizzes.forEach(t => renderCard(t, true));
+        }
+
+        window.addTeacherQuestion = function() {
+            const list = document.getElementById('teacher-questions-list');
+            const qIdx = list.children.length;
+            const card = document.createElement('div');
+            card.className = 'bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-3';
+            card.innerHTML = `
+                <div class="font-bold text-xs text-indigo-600 uppercase">Сұрақ #${qIdx + 1}</div>
+                <input type="text" class="teacher-q-prompt w-full bg-white border border-slate-200 rounded-xl p-3 text-sm text-slate-900" placeholder="Сұрақты жазыңыз...">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" class="teacher-opt-0 w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs" placeholder="A нұсқасы">
+                    <input type="text" class="teacher-opt-1 w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs" placeholder="B нұсқасы">
+                    <input type="text" class="teacher-opt-2 w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs" placeholder="C нұсқасы">
+                    <input type="text" class="teacher-opt-3 w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs" placeholder="D нұсқасы">
+                </div>
+                <div class="flex items-center gap-2 pt-1">
+                    <label class="text-xs font-bold text-slate-600">Дұрыс жауап (0=A, 1=B, 2=C, 3=D):</label>
+                    <input type="number" min="0" max="3" value="0" class="teacher-ans bg-white border border-slate-200 rounded-lg p-1.5 text-xs w-16 text-center">
+                </div>
+            `;
+            list.appendChild(card);
+        };
+
+        window.saveTeacherQuiz = async function() {
+            const titleInput = document.getElementById('teacher-quiz-title');
+            const categorySelect = document.getElementById('teacher-quiz-cat');
+            const descInput = document.getElementById('teacher-quiz-desc');
+            const title = titleInput.value.trim();
+            if (!title) { window.showToast("Тест атауын енгізіңіз!", true); return; }
+
+            const cards = document.getElementById('teacher-questions-list').children;
+            const questions = [];
+            for (let card of cards) {
+                const prompt = card.querySelector('.teacher-q-prompt').value;
+                const opts = [
+                    card.querySelector('.teacher-opt-0').value || 'A',
+                    card.querySelector('.teacher-opt-1').value || 'B',
+                    card.querySelector('.teacher-opt-2').value || 'C',
+                    card.querySelector('.teacher-opt-3').value || 'D'
+                ];
+                const ans = parseInt(card.querySelector('.teacher-ans').value) || 0;
+                if (prompt) questions.push({ q: prompt, options: opts, answer: ans, hint: "Мұғалім материалынан қараңыз." });
+            }
+            if (questions.length === 0) { window.showToast("Кем дегенде 1 сұрақ қосыңыз.", true); return; }
+
+            const newQuiz = { title, category: categorySelect.value, desc: descInput.value.trim(), questions, createdAt: Date.now() };
+
+            // Бірінші кезекте локалды сақтау (Онлайн дерекқор істемесе де басты бетте көрінеді)
+            firebaseTeacherQuizzes.unshift(newQuiz);
+            try { localStorage.setItem('local_quizzes', JSON.stringify(firebaseTeacherQuizzes)); } catch(e){}
+            
+            // Онлайн сақтауға талпыныс
+            if (db) {
+                try {
+                    const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'quizzes'), newQuiz);
+                } catch(e) {}
+            }
+
+            window.showToast("Тест сәтті сақталды және жарияланды!");
+            titleInput.value = ''; descInput.value = ''; document.getElementById('teacher-questions-list').innerHTML = '';
+            renderTopics(); window.switchRole('student');
+        };
+
+        function startQuiz(quizObj) {
+            if (!window.isLoggedIn) {
+                window.pendingQuizToStart = quizObj;
+                window.showToast("Тест бастау үшін атыңыз бен поштаңызды енгізіңіз!", true);
+                window.openAuthModal(); return;
+            }
+            window.currentQuiz = quizObj; window.currentQuestionIdx = 0;
+            window.userAnswers = new Array(quizObj.questions.length).fill(null);
+            window.switchView('quiz'); startTimer(600); renderQuestionNav(); renderQuestion();
+        }
+
+        function renderQuestion() {
+            if (!window.currentQuiz) return;
+            const q = window.currentQuiz.questions[window.currentQuestionIdx];
+            const total = window.currentQuiz.questions.length;
+
+            document.getElementById('question-index-text').textContent = `Сұрақ ${window.currentQuestionIdx + 1} / ${total}`;
+            document.getElementById('question-text').textContent = q.q;
+            document.getElementById('hint-container').classList.add('hidden');
+            document.getElementById('progress-bar').style.width = `${((window.currentQuestionIdx + 1) / total) * 100}%`;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            const letters = ['A', 'B', 'C', 'D'];
+            
+            q.options.forEach((opt, idx) => {
+                const isSelected = window.userAnswers[window.currentQuestionIdx] === idx;
+                const optDiv = document.createElement('div');
+                optDiv.className = `option-item p-4 cursor-pointer flex items-center gap-3 ${isSelected ? 'selected' : ''}`;
+                optDiv.onclick = () => { window.userAnswers[window.currentQuestionIdx] = idx; renderQuestion(); };
+                optDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg ${isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-700'} font-bold flex items-center justify-center text-sm">${letters[idx]}</div>
+                    <div class="text-sm">${opt}</div>
+                `;
+                container.appendChild(optDiv);
+            });
+
+            document.getElementById('btn-prev').disabled = window.currentQuestionIdx === 0;
+            document.getElementById('ui-btn-next').textContent = window.currentQuestionIdx === total - 1 ? "Аяқтау" : "Келесі";
+            updateNavGrid();
+        }
+
+        window.prevQuestion = function() { if (window.currentQuestionIdx > 0) { window.currentQuestionIdx--; renderQuestion(); } };
+        window.nextQuestion = function() { 
+            if (window.currentQuestionIdx < window.currentQuiz.questions.length - 1) { window.currentQuestionIdx++; renderQuestion(); } 
+            else { window.finishQuiz(); }
+        };
+
+        function renderQuestionNav() {
+            const grid = document.getElementById('nav-grid');
+            grid.innerHTML = '';
+            window.currentQuiz.questions.forEach((_, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-9 h-9 border border-slate-200 rounded-xl font-bold text-sm flex items-center justify-center cursor-pointer';
+                btn.id = `nav-btn-${idx}`; btn.textContent = idx + 1;
+                btn.onclick = () => { window.currentQuestionIdx = idx; renderQuestion(); };
+                grid.appendChild(btn);
+            });
+        }
+
+        function updateNavGrid() {
+            window.currentQuiz.questions.forEach((_, idx) => {
+                const btn = document.getElementById(`nav-btn-${idx}`);
+                btn.className = 'w-9 h-9 border border-slate-200 rounded-xl font-bold text-sm flex items-center justify-center cursor-pointer';
+                if (idx === window.currentQuestionIdx) btn.classList.add('border-indigo-600', 'text-indigo-600', 'bg-indigo-50');
+                if (window.userAnswers[idx] !== null) btn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600');
+            });
+        }
+
+        function startTimer(seconds) {
+            clearInterval(window.timerInterval); window.timerSeconds = seconds;
+            const updateDisplay = () => {
+                const m = Math.floor(window.timerSeconds / 60); const s = window.timerSeconds % 60;
+                if(document.getElementById('timer-text')) document.getElementById('timer-text').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            };
+            updateDisplay();
+            window.timerInterval = setInterval(() => {
+                window.timerSeconds--; updateDisplay();
+                if (window.timerSeconds <= 0) { clearInterval(window.timerInterval); window.finishQuiz(); }
+            }, 1000);
+        }
+
+        window.finishQuiz = async function() {
+            clearInterval(window.timerInterval); window.switchView('results');
+            if (!window.currentQuiz) return;
+            let score = 0;
+            window.currentQuiz.questions.forEach((q, idx) => { if (window.userAnswers[idx] === q.answer) score++; });
+            const total = window.currentQuiz.questions.length;
+            const percent = Math.round((score / total) * 100);
+
+            document.getElementById('score-percent').textContent = `${percent}%`;
+            document.getElementById('score-text').textContent = `${score} / ${total}`;
+            document.getElementById('result-topic-title').textContent = window.currentQuiz.title;
+
+            const reviewList = document.getElementById('review-list');
+            reviewList.innerHTML = '<h3 class="serif-heading text-lg font-bold text-slate-900 mb-4">Сұрақтарды талдау:</h3>';
+            window.currentQuiz.questions.forEach((q, idx) => {
+                const isCorrect = window.userAnswers[idx] === q.answer;
+                const userSelected = window.userAnswers[idx] !== null ? q.options[window.userAnswers[idx]] : "Жауап жоқ";
+                reviewList.innerHTML += `
+                    <div class="p-4 rounded-2xl mb-3 border-l-4 bg-slate-50 ${isCorrect ? 'border-emerald-500' : 'border-rose-500'}">
+                        <div class="font-bold text-sm text-slate-900 mb-1">${idx + 1}. ${q.q}</div>
+                        <div class="text-xs ${isCorrect ? 'text-emerald-600' : 'text-rose-600'}">Сіздің жауабыңыз: <strong>${userSelected}</strong></div>
+                        ${!isCorrect ? `<div class="text-xs text-indigo-600 mt-1">Дұрыс жауап: <strong>${q.options[q.answer]}</strong></div>` : ''}
+                    </div>
+                `;
+            });
+
+            const resultRecord = {
+                studentName: window.currentUserName || 'Оқушы', studentEmail: window.currentUserEmail || 'student@gmail.com',
+                title: window.currentQuiz.title, score, total, percent,
+                date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                timestamp: Date.now()
+            };
+
+            // Локалды сақтау
+            firebaseStudentResults.unshift(resultRecord);
+            try { localStorage.setItem('local_results', JSON.stringify(firebaseStudentResults)); } catch(e){}
+            renderHistory(); renderStudentResults();
+
+            // Дерекқорға сақтау
+            if (db) {
+                try {
+                    const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'quiz_results'), resultRecord);
+                } catch(e) {}
+            }
+            window.showToast("Нәтижеңіз сақталды!");
+        };
+
+        function renderHistory() {
+            const container = document.getElementById('history-list');
+            const myResults = firebaseStudentResults.filter(item => item.studentEmail === window.currentUserEmail);
+            if (myResults.length === 0) { container.innerHTML = `<div class="text-slate-400 text-sm">Сізде әлі тапсырылған тесттер жоқ.</div>`; return; }
+            container.innerHTML = myResults.slice(0, 5).map(item => `
+                <div class="bg-white border border-slate-100 p-4 rounded-2xl flex justify-between items-center shadow-sm">
+                    <div><div class="font-bold text-sm text-slate-800">${item.title}</div><div class="text-xs text-slate-400">${item.date}</div></div>
+                    <div class="font-extrabold text-sm ${item.percent >= 70 ? 'text-emerald-600' : 'text-rose-600'}">${item.score} / ${item.total}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderStudentResults() {
+            const tbody = document.getElementById('student-results-tbody');
+            if (firebaseStudentResults.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Нәтижелер әлі жоқ.</td></tr>`; return; }
+            tbody.innerHTML = firebaseStudentResults.map(item => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3.5 font-semibold text-slate-800">${item.studentName} <span class="text-xs text-slate-400">(${item.studentEmail})</span></td>
+                    <td class="p-3.5">${item.title}</td><td class="p-3.5 text-xs text-slate-500">${item.date}</td>
+                    <td class="p-3.5 font-bold">${item.score} / ${item.total} (${item.percent}%)</td>
+                    <td class="p-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${item.percent >= 70 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${item.percent >= 70 ? 'Өтті' : 'Қайталау'}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        window.restartQuiz = function() { if (window.currentQuiz) startQuiz(window.currentQuiz); };
+        window.getAIHint = function() { window.showToast("Кешіріңіз, AI көмекшісі уақытша қолжетімсіз."); };
+        window.generateAITopic = function() { window.showToast("Кешіріңіз, AI генерация уақытша қолжетімсіз."); };
+        window.toggleAIChat = function() { document.getElementById('ai-chat-window').classList.toggle('hidden'); };
+
+        // 3. БАЗАМЕН (FIREBASE) БАЙЛАНЫС ОРНАТУ (Қате шықса да UI істей береді)
+        try {
+            import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js").then(({ initializeApp }) => {
+                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "AIzaSyDummyKeyForFallback", authDomain: "quizly-demo.firebaseapp.com", projectId: "quizly-demo" };
+                const app = initializeApp(firebaseConfig);
+                import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js").then(({ getFirestore, collection, onSnapshot, query }) => {
+                    db = getFirestore(app);
+                    onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'quizzes')), (snapshot) => {
+                        let remote = []; snapshot.forEach(doc => remote.push(doc.data()));
+                        if(remote.length > 0) { firebaseTeacherQuizzes = remote; renderTopics(); }
+                    }, () => {});
+                    onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'quiz_results')), (snapshot) => {
+                        let remote = []; snapshot.forEach(doc => remote.push(doc.data()));
+                        if(remote.length > 0) { firebaseStudentResults = remote.sort((a, b) => b.timestamp - a.timestamp); renderHistory(); renderStudentResults(); }
+                    }, () => {});
+                });
+            });
+        } catch (error) { console.warn("Офлайн режим қосылды"); }
+
+        // Іске қосу
+        window.changeLanguage('kk');
+        if (window.isLoggedIn) document.getElementById('ui-login-btn').textContent = `👤 ${window.currentUserName}`;
+        renderHistory();
+        renderStudentResults();
+    </script>
+</body>
+</html>
